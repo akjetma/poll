@@ -18,7 +18,7 @@ enable :sessions
 MongoMapper.connection = Mongo::MongoClient.new(:pool_size => 25, :pool_timeout => 60)
 MongoMapper.database = "ferguson"
 
-helpers LayoutHelper
+helpers LayoutHelper, RateLimitHelper
 
 class String
   def faderize

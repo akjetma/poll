@@ -1,7 +1,7 @@
 get "/" do
   @poll = Poll.first
   @choices = @poll.choices.order(:votes.desc)
-  @voted = false#Response.find(ip: request.ip) if people start being lame.
+  @voted = recent_voter?(request.ip) #people started being lame.
   @midi = "let_it_snow"
   erb :"index"
 end
@@ -12,6 +12,12 @@ get "/vote/:choice_id" do
     flash[:error] = "Oops! Something got weird. Please try to vote one more time!"
     redirect "/"
   end
+
+  if recent_voter?(request.ip)
+    flash[:error] = "You just voted. Vote again at #{(Response.last_ip_response(request.ip).created_at+voting_period_length).strftime('%c')}"
+    redirect "/"
+  end
+
   c.votes += 1
   c.save!
   r = Response.new(ip: request.ip, choice_id: c.id)

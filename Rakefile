@@ -10,6 +10,18 @@ task :generate_christmas_movie_poll do
   ]
 end
 
+task :clean_mess do
+  Response.distinct(:ip).each do |ip|
+    responses = Response.where(ip: ip).order(:created_at.asc).all
+    responses[1..-1].each(&:destroy)
+  end
+
+  Choice.all.each do |choice|
+    choice.votes = choice.responses.count
+    choice.save!
+  end
+end
+
 task :clear do
   Poll.destroy_all
   Choice.destroy_all
